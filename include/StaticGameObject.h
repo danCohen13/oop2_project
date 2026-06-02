@@ -3,9 +3,7 @@
 
 class StaticGameObject : public Object {
 public:
-    StaticGameObject() = default;
+    using Object::Object;
     virtual ~StaticGameObject() = default;
-
-    // Open for passive animations (e.g., rotating coins)
-    virtual void update(float deltaTime) = 0;
+    virtual void update(float deltaTime) override = 0;
 };
