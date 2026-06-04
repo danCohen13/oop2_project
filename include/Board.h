@@ -3,18 +3,21 @@
 #include <vector>
 #include <memory>
 #include "Player.h"
-#include "StaticGameObject.h"
-#include "MovingGameObject.h"
+#include "Object.h"
+
+// Forward declarations des sous-systèmes
+class CollisionManager;
+class LevelGenerator;
+class ObjectCleaner;
 
 class Board {
 public:
     Board();
-    ~Board() = default;
+    ~Board();
 
     Board(const Board&) = delete;
     Board& operator=(const Board&) = delete;
 
-    // CORRECTION : Signature simplifiée à 2 arguments
     void play(float deltaTime, bool isThrusting);
     void draw(sf::RenderWindow& window) const;
 
@@ -22,14 +25,11 @@ public:
     sf::Vector2f getPlayerPosition() const;
 
 private:
-    // CORRECTION : Plus besoin de fenêtre ici
-    void generateLevel(float deltaTime);
-    void checkCollisions();
-
     std::unique_ptr<Player> m_player;
-    std::vector<std::unique_ptr<StaticGameObject>> m_statics;
-    std::vector<std::unique_ptr<MovingGameObject>> m_movings;
+    std::vector<std::unique_ptr<Object>> m_objects; // Vecteur unique unifié
 
-    float m_coinTimer;
-    float m_laserTimer;
+    // Sous-composants d'architecture séparés
+    std::unique_ptr<CollisionManager> m_collisionManager;
+    std::unique_ptr<LevelGenerator> m_levelGenerator;
+    std::unique_ptr<ObjectCleaner> m_objectCleaner;
 };

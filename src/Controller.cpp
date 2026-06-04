@@ -9,6 +9,8 @@ Controller::Controller()
 
     // 1. CHARGEMENT DES ASSETS DEPUIS LE DOSSIER RESOURCES
     auto& resources = Resources::getInstance();
+    resources.loadTexture("warehouse_background", "resources/warehouse_background.png");
+    resources.loadTexture("start_background", "resources/GameMenu.png");
     resources.loadTexture("background", "resources/Hall.png");
     resources.loadTexture("player", "resources/JetpackWalking.png");
     resources.loadFont("resources/New Athletic M54.ttf");
