@@ -1,4 +1,4 @@
-#include "Board.h"
+﻿#include "Board.h"
 #include <algorithm>
 #include <cstdlib>
 
@@ -8,18 +8,21 @@ Board::Board()
     m_laserTimer(4.0f) {
 }
 
-void Board::play(sf::RenderWindow& window, float deltaTime, bool isThrusting) {
+// CORRECTION : Implémentation sans sf::RenderWindow
+void Board::play(float deltaTime, bool isThrusting) {
     m_player->update(deltaTime, isThrusting);
 
     for (auto& obj : m_movings) obj->update(deltaTime);
     for (auto& obj : m_statics) obj->update(deltaTime);
 
     checkCollisions();
-    generateLevel(window, deltaTime);
+    generateLevel(deltaTime); // Appel mis à jour
 
-    float cullX = window.getView().getCenter().x - window.getView().getSize().x / 2.0f;
+    // CORRECTION ARCHITECTURALE :
+    // Puisque la caméra suit le joueur avec un tiers d'écran de décalage,
+    // la limite gauche de l'écran visible se trouve exactement à : position du joueur - 400 pixels.
+    float cullX = m_player->getPosition().x - 400.0f;
 
-    // SFML 3.0 uses size.x instead of width
     m_statics.erase(
         std::remove_if(m_statics.begin(), m_statics.end(),
             [cullX](const std::unique_ptr<StaticGameObject>& obj) {
@@ -43,7 +46,8 @@ void Board::draw(sf::RenderWindow& window) const {
     m_player->draw(window);
 }
 
-void Board::generateLevel(sf::RenderWindow& window, float deltaTime) {
+// CORRECTION : Nettoyage du paramètre window inutile
+void Board::generateLevel(float deltaTime) {
     m_coinTimer -= deltaTime;
     m_laserTimer -= deltaTime;
 
@@ -58,7 +62,6 @@ void Board::generateLevel(sf::RenderWindow& window, float deltaTime) {
 void Board::checkCollisions() {
     sf::FloatRect playerBounds = m_player->getGlobalBounds();
 
-    // SFML 3.0 uses findIntersection().has_value() instead of intersects()
     m_statics.erase(
         std::remove_if(m_statics.begin(), m_statics.end(),
             [this, playerBounds](const std::unique_ptr<StaticGameObject>& obj) {

@@ -1,6 +1,7 @@
 #pragma once
 #include "Screen.h"
 #include "Board.h"
+#include <vector>
 
 class GameplayScreen : public Screen {
 public:
@@ -12,7 +13,8 @@ public:
 
 private:
     Board m_board;
-    sf::Sprite m_backgrounds[2];
+    std::vector<sf::Sprite> m_backgrounds;
 
     const float SCREEN_WIDTH = 1200.0f;
+    const float SCREEN_HEIGHT = 600.0f; // <-- AJOUTEZ CETTE LIGNE ICI
 };

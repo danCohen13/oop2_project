@@ -1,9 +1,20 @@
-#include "Controller.h"
+﻿#include "Controller.h"
 #include "MenuScreen.h"
+#include "Resources.h"    // <-- AJOUTEZ CETTE LIGNE ICI
+#include "GameplayScreen.h"
 #include <optional>
 
 Controller::Controller()
     : m_window(sf::VideoMode({ 1200, 600 }), "Jetpack Joyride") {
+
+    // 1. CHARGEMENT DES ASSETS DEPUIS LE DOSSIER RESOURCES
+    auto& resources = Resources::getInstance();
+    resources.loadTexture("background", "resources/Hall.png");
+    resources.loadTexture("player", "resources/JetpackWalking.png");
+    resources.loadFont("resources/New Athletic M54.ttf");
+    resources.loadTexture("Exhaust", "resources/Exhaust.png");
+
+    // 2. ENCHAINEMENT SUR LE PREMIER ÉCRAN
     m_screens.push(std::make_unique<MenuScreen>(m_screens));
 }
 

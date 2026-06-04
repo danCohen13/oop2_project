@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include <SFML/Graphics.hpp>
 #include <vector>
 #include <memory>
@@ -14,14 +14,16 @@ public:
     Board(const Board&) = delete;
     Board& operator=(const Board&) = delete;
 
-    void play(sf::RenderWindow& window, float deltaTime, bool isThrusting);
+    // CORRECTION : Signature simplifiée à 2 arguments
+    void play(float deltaTime, bool isThrusting);
     void draw(sf::RenderWindow& window) const;
 
     bool isPlayerAlive() const;
     sf::Vector2f getPlayerPosition() const;
 
 private:
-    void generateLevel(sf::RenderWindow& window, float deltaTime);
+    // CORRECTION : Plus besoin de fenêtre ici
+    void generateLevel(float deltaTime);
     void checkCollisions();
 
     std::unique_ptr<Player> m_player;
