@@ -2,6 +2,7 @@
 #include "Screen.h"
 #include "Board.h"
 #include "BackgroundSystem.h"
+#include "InputHandler.h" 
 
 class GameplayScreen : public Screen {
 public:
@@ -12,10 +13,10 @@ public:
     virtual void draw(sf::RenderWindow& window) override;
 
 private:
-    // CORRECTION : static constexpr garantit une initialisation immédiate et sécurisée
     static constexpr float SCREEN_WIDTH = 1200.0f;
     static constexpr float SCREEN_HEIGHT = 600.0f;
 
     Board m_board;
     BackgroundSystem m_backgroundSystem;
+    InputHandler m_inputHandler; 
 };

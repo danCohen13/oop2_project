@@ -15,6 +15,9 @@ Controller::Controller()
     resources.loadTexture("player", "resources/JetpackWalking.png");
     resources.loadFont("resources/New Athletic M54.ttf");
     resources.loadTexture("Exhaust", "resources/Exhaust.png");
+    resources.loadTexture("Coin", "resources/Coin.png");
+    resources.loadTexture("Laser", "resources/Laser.png");
+
 
     // 2. ENCHAINEMENT SUR LE PREMIER ÉCRAN
     m_screens.push(std::make_unique<MenuScreen>(m_screens));
