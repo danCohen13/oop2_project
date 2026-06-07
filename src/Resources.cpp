@@ -1,4 +1,5 @@
-#include "Resources.h"
+﻿#include "Resources.h"
+#include "GameException.h" 
 
 Resources& Resources::getInstance() {
     static Resources instance;
@@ -7,21 +8,27 @@ Resources& Resources::getInstance() {
 
 void Resources::loadTexture(const std::string& name, const std::string& filename) {
     sf::Texture tex;
-    if (tex.loadFromFile(filename)) {
-        m_textures[name] = tex;
+    // Si le chargement échoue, on lève une exception immédiatement
+    if (!tex.loadFromFile(filename)) {
+        throw GameException("Erreur critique : Impossible de charger l'image -> " + filename);
     }
+    m_textures[name] = std::move(tex);
 }
 
 void Resources::loadSound(const std::string& name, const std::string& filename) {
     sf::SoundBuffer buffer;
-    if (buffer.loadFromFile(filename)) {
-        m_sounds[name] = buffer;
+    // Gestion des exceptions pour les fichiers audio (.wav, .ogg)
+    if (!buffer.loadFromFile(filename)) {
+        throw GameException("Erreur critique : Impossible de charger le son -> " + filename);
     }
+    m_sounds[name] = std::move(buffer);
 }
 
 void Resources::loadFont(const std::string& filename) {
-    // SFML 3.0 uses openFromFile for fonts
-    m_font.openFromFile(filename);
+    // CORRECTION SFML 3.0 : Utilisation obligatoire de openFromFile() pour les polices
+    if (!m_font.openFromFile(filename)) {
+        throw GameException("Erreur critique : Impossible de charger la police -> " + filename);
+    }
 }
 
 const sf::Texture& Resources::getTexture(const std::string& name) const {
