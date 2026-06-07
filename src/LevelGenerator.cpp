@@ -1,5 +1,6 @@
 ﻿#include "LevelGenerator.h"
-#include "GameObjectFactory.h" // Nécessaire pour instancier les objets polymorphiques
+#include "GameObjectFactory.h"
+
 #include <cstdlib>
 
 LevelGenerator::LevelGenerator()
@@ -10,51 +11,26 @@ void LevelGenerator::generate(float deltaTime, std::vector<std::unique_ptr<Objec
     m_coinTimer -= deltaTime;
     m_laserTimer -= deltaTime;
 
-    // ========================================================================
-    // 1. GESTION DES GROUPES DE PIÈCES (LOGIQUE DE PATTERNS)
-    // ========================================================================
+    // 1. Génération des pièces régulières (Remets bien l'image Coin.png pour elles !)
     if (m_coinTimer <= 0.0f) {
-        // Point d'ancrage initial (Ancrage X hors-écran à droite, Y aléatoire encadré)
         float spawnX = playerX + 1300.0f;
-        float spawnY = static_cast<float>(100 + rand() % 350); // Reste entre le sol et le plafond
+        float spawnY = static_cast<float>(150 + rand() % 300);
 
-        // Choisir une forme au hasard (0 = Ligne horizontale, 1 = Bloc carré 3x3)
-        int patternType = rand() % 2;
-
-        if (patternType == 0) {
-            // Pattern A : Créer une ligne horizontale de 5 pièces individuelles espacées
-            for (int i = 0; i < 5; ++i) {
-                float coinX = spawnX + (static_cast<float>(i) * 40.0f);
-
-                // On passe la coordonnée calculée directement à l'usine générique
-                objects.push_back(GameObjectFactory::createObject("Coin", { coinX, spawnY }));
-            }
-        }
-        else if (patternType == 1) {
-            // Pattern B : Créer un bloc carré de 3x3 pièces individuelles espacées
-            for (int row = 0; row < 3; ++row) {
-                for (int col = 0; col < 3; ++col) {
-                    float coinX = spawnX + (static_cast<float>(col) * 40.0f);
-                    float coinY = spawnY + (static_cast<float>(row) * 40.0f);
-
-                    objects.push_back(GameObjectFactory::createObject("Coin", { coinX, coinY }));
-                }
-            }
-        }
-
-        // Relancer le timer pour le prochain groupe de pièces (entre 3 et 7 secondes)
-        m_coinTimer = static_cast<float>(3 + rand() % 5);
+        objects.push_back(GameObjectFactory::createObject("Coin", { spawnX, spawnY }));
+        m_coinTimer = static_cast<float>(3 + rand() % 4);
     }
 
-    // ========================================================================
-    // 2. GESTION DES LASERS (CONSERVÉE ACTIVE)
-    // ========================================================================
+    // 2. LOGIQUE CORRIGÉE : Génération des vrais Lasers à états
     if (m_laserTimer <= 0.0f) {
-        float laserX = playerX + 1500.0f;
-        float laserY = static_cast<float>(100 + rand() % 400);
+        float spawnX = playerX + 1500.0f;
+        float spawnY = static_cast<float>(150 + rand() % 300);
 
-        objects.push_back(GameObjectFactory::createObject("Laser", { laserX, laserY }));
+        // On alterne aléatoirement entre Laser Horizontal et Vertical
+        LaserOrientation orientation = (rand() % 2 == 0) ? LaserOrientation::Horizontal : LaserOrientation::Vertical;
 
-        m_laserTimer = static_cast<float>(4 + rand() % 6);
+        // On injecte un vrai Laser dans le vecteur de jeu
+        objects.push_back(std::make_unique<Laser>(sf::Vector2f{ spawnX, spawnY }, orientation));
+
+        m_laserTimer = static_cast<float>(5 + rand() % 5);
     }
 }

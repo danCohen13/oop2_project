@@ -1,34 +1,48 @@
 ﻿#include "StaticGameObject.h"
 
 StaticGameObject::StaticGameObject(const sf::Texture& texture, const sf::Vector2f& position, int frameCount)
-    : Object(texture), m_frameCount(frameCount), m_currentFrame(0), m_frameTimer(0.0f)
+    : Object(texture), m_currentFrame(0), m_frameTimer(0.0f)
 {
-    // 1. Calcul de la taille d'une seule frame
-    float frameWidth = static_cast<float>(texture.getSize().x) / m_frameCount;
+    // 1. Calcul de la taille d'une frame individuelle
+    float frameWidth = static_cast<float>(texture.getSize().x) / frameCount;
     float frameHeight = static_cast<float>(texture.getSize().y);
 
-    // 2. Découpage chirurgical de la première frame (Hitbox parfaite)
-    m_sprite.setTextureRect(sf::IntRect({ 0, 0 }, { static_cast<int>(frameWidth), static_cast<int>(frameHeight) }));
+    // 2. PRÉ-CALCUL ET STOCKAGE : On remplit le vecteur hérité
+    for (int i = 0; i < frameCount; ++i) {
+        m_frames.push_back(sf::IntRect(
+            { static_cast<int>(i * frameWidth), 0 },
+            { static_cast<int>(frameWidth), static_cast<int>(frameHeight) }
+        ));
+    }
 
-    // 3. Centrage de l'origine au milieu de cette frame unique
+    // 3. Application de la première frame de départ pour sécuriser la Hitbox
+    if (!m_frames.empty()) {
+        m_sprite.setTextureRect(m_frames[0]);
+    }
+
+    // 4. Centrage de l'origine et positionnement initial
     m_sprite.setOrigin({ frameWidth / 2.0f, frameHeight / 2.0f });
     m_sprite.setPosition(position);
     m_sprite.setScale({ 1.0f, 1.0f });
 }
 
-void StaticGameObject::update(float deltaTime) {
-    if (m_frameCount <= 1) return; // Pas d'animation si c'est une image fixe
+void StaticGameObject::animate(float deltaTime) {
+    // S'il n'y a qu'une seule frame (ex: un décor fixe), pas besoin d'animer
+    if (m_frames.size() <= 1) return;
 
     m_frameTimer += deltaTime;
     if (m_frameTimer >= FRAME_DURATION) {
         m_frameTimer = 0.0f;
-        m_currentFrame = (m_currentFrame + 1) % m_frameCount;
 
-        float frameWidth = static_cast<float>(m_sprite.getTexture().getSize().x) / m_frameCount;
-        int frameHeight = m_sprite.getTexture().getSize().y;
+        // Progression circulaire dans le vecteur pré-calculé
+        m_currentFrame = (m_currentFrame + 1) % m_frames.size();
 
-        // Déplacement du rectangle de lecture sur la frame suivante
-        m_sprite.setTextureRect(sf::IntRect({ static_cast<int>(m_currentFrame * frameWidth), 0 },
-            { static_cast<int>(frameWidth), frameHeight }));
+        // Application instantanée sans calcul mathématique lourd
+        m_sprite.setTextureRect(m_frames[m_currentFrame]);
     }
+}
+
+void StaticGameObject::update(float deltaTime) {
+    // Par défaut, l'infrastructure anime l'objet statique en boucle
+    animate(deltaTime);
 }
