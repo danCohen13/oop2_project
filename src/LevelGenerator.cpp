@@ -1,104 +1,85 @@
 ﻿#include "LevelGenerator.h"
-#include "GameObjectFactory.h"
+#include "CoinFormation.h"
 #include <cstdlib>
-#include <cmath> // Pour std::sin
 
 LevelGenerator::LevelGenerator()
-    : m_coinTimer(1.0f) {
+    : m_nextSpawnX(0.0f) {
 }
 
 void LevelGenerator::generate(float deltaTime, std::vector<std::unique_ptr<Object>>& objects, float playerX) {
-    m_coinTimer -= deltaTime;
+    (void)deltaTime; // Évite le warning de paramètre non utilisé
 
-    if (m_coinTimer <= 0.0f) {
-        // Apparition loin devant le joueur pour éviter le pop visuel
-        float spawnX = playerX + 1400.0f;
-        // Hauteur de base aléatoire et centrée
-        float spawnY = static_cast<float>(200 + rand() % 150);
+    // Zone d'apparition hors-champ à droite (1200 de largeur + marge de 200px)
+    float currentSpawnZoneX = playerX + 1400.0f;
 
-        // Choix de la figure (0 à 3)
-        int formationType = rand() % 4;
+    if (m_nextSpawnX == 0.0f) {
+        m_nextSpawnX = currentSpawnZoneX;
+    }
+
+    if (currentSpawnZoneX >= m_nextSpawnX) {
+        float spawnX = m_nextSpawnX;
+        int formationType = rand() % 5;
+
+        float formationWidth = 0.0f;
+        float spawnY = 0.0f;
 
         switch (formationType) {
-        case 0:
-            // Ligne droite de 6 pièces
-            spawnHorizontalLine(objects, spawnX, spawnY, 6);
-            m_coinTimer = 3.5f;
-            break;
-
-        case 1:
-            // Un bloc parfait de 3x3 pièces bien alignées
-            spawnBlock(objects, spawnX, spawnY, 3, 3);
-            m_coinTimer = 4.0f;
-            break;
-
-        case 2:
-            // Une belle ondulation sinusoïdale de 8 pièces
-            spawnWave(objects, spawnX, spawnY, 8);
-            m_coinTimer = 4.5f;
-            break;
-
-        case 3:
-            // Une flèche indicative pointant vers la droite
-            spawnArrow(objects, spawnX, spawnY);
-            m_coinTimer = 5.0f;
-            break;
-
-        default:
+        case 0: { // LIGNE
+            int length = 8 + rand() % 6;
+            int thickness = 1 + rand() % 3;
+            float minY = CEILING_LIMIT;
+            float maxY = FLOOR_LIMIT - ((thickness - 1) * COIN_SPACING);
+            spawnY = minY + static_cast<float>(rand() % static_cast<int>(maxY - minY + 1));
+            CoinFormation::createLine(objects, spawnX, spawnY, COIN_SPACING, length, thickness);
+            formationWidth = length * COIN_SPACING;
             break;
         }
-    }
-}
-
-// FORMATION A : Ligne horizontale
-void LevelGenerator::spawnHorizontalLine(std::vector<std::unique_ptr<Object>>& objects, float startX, float startY, int count) {
-    for (int i = 0; i < count; ++i) {
-        float x = startX + (i * COIN_SPACING);
-        objects.push_back(GameObjectFactory::createObject("Coin", { x, startY }));
-    }
-}
-
-// FORMATION B : Bloc rectangulaire (Matrice)
-void LevelGenerator::spawnBlock(std::vector<std::unique_ptr<Object>>& objects, float startX, float startY, int rows, int cols) {
-    for (int r = 0; r < rows; ++r) {
-        for (int c = 0; c < cols; ++c) {
-            float x = startX + (c * COIN_SPACING);
-            float y = startY + (r * COIN_SPACING);
-            objects.push_back(GameObjectFactory::createObject("Coin", { x, y }));
+        case 1: { // DIAGONALE
+            int length = 4 + rand() % 3;
+            float minY = CEILING_LIMIT;
+            float maxY = FLOOR_LIMIT - ((length - 1) * COIN_SPACING);
+            spawnY = minY + static_cast<float>(rand() % static_cast<int>(maxY - minY + 1));
+            CoinFormation::createDiagonal(objects, spawnX, spawnY, COIN_SPACING, length);
+            formationWidth = length * COIN_SPACING;
+            break;
         }
+        case 2: { // VAGUE (SERPENT)
+            int length = 12 + rand() % 6;
+            float amplitude = COIN_SPACING * 1.4f;
+            float minY = CEILING_LIMIT + amplitude;
+            float maxY = FLOOR_LIMIT - amplitude;
+            spawnY = minY + static_cast<float>(rand() % static_cast<int>(maxY - minY + 1));
+
+            CoinFormation::createWave(objects, spawnX, spawnY, COIN_SPACING, length);
+            // AJUSTEMENT : Prise en compte du nouvel espacement horizontal du serpent
+            formationWidth = length * (COIN_SPACING * 1.3f);
+            break;
+        }
+        case 3: { // TRIANGLE
+            int size = 3 + rand() % 3;
+            float minY = CEILING_LIMIT;
+            float maxY = FLOOR_LIMIT - ((size - 1) * COIN_SPACING);
+            spawnY = minY + static_cast<float>(rand() % static_cast<int>(maxY - minY + 1));
+            CoinFormation::createTriangle(objects, spawnX, spawnY, COIN_SPACING, size);
+            formationWidth = size * COIN_SPACING;
+            break;
+        }
+        case 4: { // CERCLE
+            int radiusFactor = 2;
+            float radius = COIN_SPACING * (static_cast<float>(radiusFactor) + 0.4f);
+            float minY = CEILING_LIMIT + radius;
+            float maxY = FLOOR_LIMIT - radius;
+            spawnY = minY + static_cast<float>(rand() % static_cast<int>(maxY - minY + 1));
+
+            CoinFormation::createCircle(objects, spawnX, spawnY, COIN_SPACING, radiusFactor);
+            // AJUSTEMENT : Prise en compte du diamètre total mis à jour
+            formationWidth = radius * 2.0f;
+            break;
+        }
+        }
+
+        // Raréfaction des formes : grand espace vide aléatoire avant la prochaine forme
+        float separationPadding = 1800.0f + static_cast<float>(rand() % 1200);
+        m_nextSpawnX = spawnX + formationWidth + separationPadding;
     }
-}
-
-// FORMATION C : Vague sinusoïdale
-void LevelGenerator::spawnWave(std::vector<std::unique_ptr<Object>>& objects, float startX, float startY, int count) {
-    float amplitude = 60.0f; // Hauteur de la courbe
-    float frequency = 0.6f;  // Courbure de la vague
-
-    for (int i = 0; i < count; ++i) {
-        float x = startX + (i * COIN_SPACING);
-        float y = startY + std::sin(i * frequency) * amplitude;
-        objects.push_back(GameObjectFactory::createObject("Coin", { x, y }));
-    }
-}
-
-// FORMATION D : Flèche directionnelle propre (>)
-void LevelGenerator::spawnArrow(std::vector<std::unique_ptr<Object>>& objects, float startX, float startY) {
-    // La pointe droite de la flèche (le sommet du triangle)
-    float peakX = startX + (2 * COIN_SPACING);
-    float peakY = startY;
-
-    // 1. La pointe (Peak)
-    objects.push_back(GameObjectFactory::createObject("Coin", { peakX, peakY }));
-
-    // 2. L'aile supérieure (va vers le haut et la gauche)
-    objects.push_back(GameObjectFactory::createObject("Coin", { peakX - COIN_SPACING, peakY - COIN_SPACING }));
-    objects.push_back(GameObjectFactory::createObject("Coin", { peakX - (2 * COIN_SPACING), peakY - (2 * COIN_SPACING) }));
-
-    // 3. L'aile inférieure (va vers le bas et la gauche)
-    objects.push_back(GameObjectFactory::createObject("Coin", { peakX - COIN_SPACING, peakY + COIN_SPACING }));
-    objects.push_back(GameObjectFactory::createObject("Coin", { peakX - (2 * COIN_SPACING), peakY + (2 * COIN_SPACING) }));
-
-    // 4. La queue centrale de la flèche (part du peak vers la gauche)
-    objects.push_back(GameObjectFactory::createObject("Coin", { peakX - COIN_SPACING, peakY }));
-    objects.push_back(GameObjectFactory::createObject("Coin", { peakX - (2 * COIN_SPACING), peakY }));
 }

@@ -11,14 +11,12 @@ public:
     void generate(float deltaTime, std::vector<std::unique_ptr<Object>>& objects, float playerX);
 
 private:
-    float m_coinTimer;
+    float m_nextSpawnX;
 
-    // Constante d'espacement entre deux pièces (en pixels)
+    // Espacement idéal pour un écran de 600px de haut
     const float COIN_SPACING = 65.0f;
 
-    // Générateurs de formes géométriques
-    void spawnHorizontalLine(std::vector<std::unique_ptr<Object>>& objects, float startX, float startY, int count);
-    void spawnBlock(std::vector<std::unique_ptr<Object>>& objects, float startX, float startY, int rows, int cols);
-    void spawnWave(std::vector<std::unique_ptr<Object>>& objects, float startX, float startY, int count);
-    void spawnArrow(std::vector<std::unique_ptr<Object>>& objects, float startX, float startY);
+    // ÉCRAN 1200 x 600 : Ajustement strict des limites visibles
+    const float CEILING_LIMIT = 50.0f;  // Plafond du niveau
+    const float FLOOR_LIMIT = 530.0f;   // Sol du niveau (ajuste à 540 ou 550 si ton sol est plus bas)
 };
