@@ -14,7 +14,7 @@ private:
     float m_nextSpawnX;
 
     // Espacement idéal pour un écran de 600px de haut
-    const float COIN_SPACING = 65.0f;
+    const float COIN_SPACING = 48.0f;
 
     // ÉCRAN 1200 x 600 : Ajustement strict des limites visibles
     const float CEILING_LIMIT = 50.0f;  // Plafond du niveau

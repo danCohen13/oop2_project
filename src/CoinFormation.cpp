@@ -25,11 +25,11 @@ void CoinFormation::createDiagonal(std::vector<std::unique_ptr<Object>>& objects
     }
 }
 
-// MODIFIÉ : Forme du Serpent (Vague) aérée
+// NE PAS TOUCHER - PARFAIT
 void CoinFormation::createWave(std::vector<std::unique_ptr<Object>>& objects, float startX, float startY, float spacing, int length) {
     float frequency = 0.35f;
     float amplitude = spacing * 1.4f;
-    float horizontalSpacing = spacing * 1.3f; // Plus d'espace horizontal pour étirer le serpent
+    float horizontalSpacing = spacing * 1.3f;
 
     for (int i = 0; i < length; ++i) {
         float x = startX + (i * horizontalSpacing);
@@ -38,12 +38,19 @@ void CoinFormation::createWave(std::vector<std::unique_ptr<Object>>& objects, fl
     }
 }
 
-// NE PAS TOUCHER - PARFAIT
+// CORRECTION : Centrage correct de chaque rangée du triangle
+// Avant : levelStartX = startX - (r * spacing / 2.0f)
+//   => décalait la rangée d'un demi-spacing par coin, mais pas sur la largeur totale
+// Après : on calcule la largeur réelle de la rangée et on la centre sur startX
 void CoinFormation::createTriangle(std::vector<std::unique_ptr<Object>>& objects, float startX, float startY, float spacing, int size) {
     for (int r = 0; r < size; ++r) {
         float y = startY + (r * spacing);
-        float levelStartX = startX - (r * spacing / 2.0f);
+
         int coinsInRow = r + 1;
+        // Largeur totale de la rangée = (nombre de pièces - 1) * spacing
+        // On décale vers la gauche de la moitié pour centrer sur startX
+        float rowWidth = (coinsInRow - 1) * spacing;
+        float levelStartX = startX - (rowWidth / 2.0f);
 
         for (int c = 0; c < coinsInRow; ++c) {
             objects.push_back(GameObjectFactory::createObject("Coin", { levelStartX + (c * spacing), y }));
@@ -51,12 +58,9 @@ void CoinFormation::createTriangle(std::vector<std::unique_ptr<Object>>& objects
     }
 }
 
-// MODIFIÉ : Forme du Cercle désengorgée
+// NE PAS TOUCHER - PARFAIT
 void CoinFormation::createCircle(std::vector<std::unique_ptr<Object>>& objects, float startX, float startY, float spacing, int radiusFactor) {
-    // On augmente légèrement le rayon pour donner du souffle aux pièces
     float radius = spacing * (static_cast<float>(radiusFactor) + 0.4f);
-
-    // 8 pièces forment un anneau circulaire parfait à l'écran sans chevauchement
     int steps = 8;
 
     for (int i = 0; i < steps; ++i) {

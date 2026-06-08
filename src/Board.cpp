@@ -4,7 +4,7 @@
 #include "ObjectCleaner.h"
 #include "GameObjectFactory.h" 
 #include "Coin.h"
-//#include "Laser.h" 
+#include "Laser.h" 
 
 Board::Board()
     : m_player(std::make_unique<Player>()),
@@ -13,7 +13,7 @@ Board::Board()
     m_objectCleaner(std::make_unique<ObjectCleaner>())
 {
     GameObjectFactory::registerType<Coin>("Coin");
-    //GameObjectFactory::registerType<Laser>("Laser"); 
+    GameObjectFactory::registerType<Laser>("Laser"); 
 }
 
 Board::~Board() = default;

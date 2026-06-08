@@ -2,11 +2,10 @@
 #include "Resources.h"
 
 Coin::Coin(const sf::Vector2f& position)
-// On passe '4' au parent : il va automatiquement générer 4 sf::IntRect dans m_frames !
-    : StaticGameObject(Resources::getInstance().getTexture("Coin"), position, 4),
+// CORRECTION : Coin.png fait 320x40px = 8 frames de 40px chacune
+    : StaticGameObject(Resources::getInstance().getTexture("Coin"), position, 8),
     m_isDisposed(false)
 {
-    // C'EST TOUT ! Le vecteur m_frames est déjà prêt et exploitable.
 }
 
 void Coin::draw(sf::RenderWindow& window) const {
@@ -14,7 +13,6 @@ void Coin::draw(sf::RenderWindow& window) const {
 }
 
 void Coin::update(float deltaTime) {
-    // On appelle directement la mise à jour parente qui gère la rotation infinie
     StaticGameObject::update(deltaTime);
 }
 
