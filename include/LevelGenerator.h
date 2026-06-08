@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include <vector>
 #include <memory>
 #include "Object.h"
@@ -12,5 +12,13 @@ public:
 
 private:
     float m_coinTimer;
-    float m_laserTimer;
+
+    // Constante d'espacement entre deux pièces (en pixels)
+    const float COIN_SPACING = 65.0f;
+
+    // Générateurs de formes géométriques
+    void spawnHorizontalLine(std::vector<std::unique_ptr<Object>>& objects, float startX, float startY, int count);
+    void spawnBlock(std::vector<std::unique_ptr<Object>>& objects, float startX, float startY, int rows, int cols);
+    void spawnWave(std::vector<std::unique_ptr<Object>>& objects, float startX, float startY, int count);
+    void spawnArrow(std::vector<std::unique_ptr<Object>>& objects, float startX, float startY);
 };
