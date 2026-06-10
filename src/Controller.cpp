@@ -29,7 +29,6 @@ void Controller::run() {
     while (m_window.isOpen() && !m_screens.empty()) {
         float deltaTime = m_clock.restart().asSeconds();
 
-        // SFML 3.0 variant event polling mechanism
         while (const std::optional event = m_window.pollEvent()) {
             if (event->is<sf::Event::Closed>()) {
                 m_window.close();

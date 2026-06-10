@@ -4,6 +4,9 @@
 #include <cstdlib> // Pour EXIT_SUCCESS et EXIT_FAILURE
 
 int main() {
+
+    std::srand(static_cast<unsigned int>(std::time(nullptr)));
+
     try {
         // Le jeu essaie de se lancer normalement
         Controller game;
