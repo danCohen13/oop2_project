@@ -25,7 +25,7 @@ void GameplayScreen::update(float deltaTime) {
     m_session.update(deltaTime, isThrusting);
 
     // 2. Synchronisation de l'affichage avec les données actuelles
-    m_hud.updateTexts(m_session.getScore(), m_session.getLives());
+    m_hud.updateTexts(m_session.getScore(), m_session.getLives(), m_session.getDistanceInMeters());
 
     // 3. Défilement de l'arrière-plan
     m_backgroundSystem.update(deltaTime, m_session.getPlayerPosition().x);

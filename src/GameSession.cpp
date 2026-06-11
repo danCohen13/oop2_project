@@ -34,5 +34,17 @@ int GameSession::getLives() const { return m_lives; }
 bool GameSession::isGameOver() const { return m_lives <= 0 || !m_board.isPlayerAlive(); }
 sf::Vector2f GameSession::getPlayerPosition() const { return m_board.getPlayerPosition(); }
 
+int GameSession::getDistanceInMeters() const {
+    float playerX = getPlayerPosition().x;
+
+    // Le joueur commence à X = 100, on soustrait 100 pour démarrer à 0m.
+    float distanceInPixels = playerX - 100.0f;
+
+    // Règle de conversion : 100 pixels = 1 mètre
+    int meters = static_cast<int>(distanceInPixels / 100.0f);
+
+    return (meters < 0) ? 0 : meters; // Sécurité pour éviter les nombres négatifs au tout début
+}
+
 void GameSession::addScore(int points) { m_score += points; }
 void GameSession::removeLife() { m_lives--; }

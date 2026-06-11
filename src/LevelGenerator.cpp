@@ -126,7 +126,7 @@ void LevelGenerator::generate(float deltaTime, std::vector<std::unique_ptr<Objec
         // =====================================================================
         // CALCUL DU PROCHAIN SPAWN (Espacement garanti entre chaque événement)
         // =====================================================================
-        float separationPadding = 900.0f + static_cast<float>(rand() % 600);
+        float separationPadding = 500.0f + static_cast<float>(rand() % 600);
         m_nextSpawnX = spawnX + generationWidth + separationPadding;
     }
 }

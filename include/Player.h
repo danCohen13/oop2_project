@@ -1,12 +1,16 @@
 ﻿#pragma once
 #include "MovingGameObject.h"
+#include <memory>
+
+class PlayerState; // Forward declaration
 
 class Player : public MovingGameObject {
 public:
+    enum class MovementType { Walking, Jumping };
+
     Player();
     virtual ~Player() = default;
 
-    // Gestion des mises à jour
     void update(float deltaTime, bool isThrusting);
     virtual void update(float deltaTime) override { update(deltaTime, false); }
 
@@ -16,23 +20,25 @@ public:
 
     bool isDead() const;
     void setDead(bool dead);
+    bool isThrusting() const;
+
+    // Getters publics pour permettre aux États de modifier les composants graphiques
+    sf::Sprite& getSprite() { return m_sprite; }
+    sf::Sprite& getFlameSprite() { return m_flameSprite; }
 
 private:
     float m_verticalVelocity;
     bool m_isDead;
+    bool m_isThrusting;
 
-    // Variables pour l'animation du personnage
-    int m_currentFrame = 0;
-    float m_frameTimer = 0.0f;
-    const float FRAME_DURATION = 0.1f;
-
-    // Variables pour la flamme du jetpack (SFML 3.0 demande une initialisation immédiate ou dans le constructeur)
     sf::Sprite m_flameSprite;
-    bool m_drawFlame = false;
 
-    // Physiques et limites de l'écran
+    // Infrastructure de la Machine d'États Aplatie
+    std::unique_ptr<PlayerState> m_state;
+    MovementType m_currentMovement;
+
     const float GRAVITY = 980.0f;
     const float JETPACK_FORCE = -600.0f;
     const float CEILING_Y = 50.0f;
-    float m_floorY; // Déclaration de la variable pour le sol calculé dynamiquement
+    float m_floorY;
 };

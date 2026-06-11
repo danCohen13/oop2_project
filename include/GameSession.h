@@ -13,6 +13,7 @@ public:
     int getLives() const;
     bool isGameOver() const;
     sf::Vector2f getPlayerPosition() const;
+    int getDistanceInMeters() const;
 
     // Fonctions pour manipuler les données depuis le Board ou CollisionManager plus tard
     void addScore(int points);
