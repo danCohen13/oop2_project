@@ -1,14 +1,16 @@
 #pragma once
 #include "PlayerState.h"
 
+class Exhaust; // Forward Declaration
+
 class JumpState : public PlayerState {
 public:
     JumpState();
     void update(Player& player, float deltaTime) override;
+
     void draw(sf::RenderWindow& window,
         const sf::Sprite& playerSprite,
-        const sf::Sprite& flameSprite,
-        bool isThrusting) const override;
+        const Exhaust& exhaust) const override; // <-- Correspondance exacte
 
 private:
     int m_currentFrame;

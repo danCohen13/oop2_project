@@ -10,5 +10,5 @@ void MenuScreen::handleEvent(const sf::Event& event) {
     }
 }
 
-void MenuScreen::update(float deltaTime) {}
+void MenuScreen::update(float ) {}
 void MenuScreen::draw(sf::RenderWindow& window) {}

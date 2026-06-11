@@ -8,9 +8,9 @@ Player::Player()
     m_verticalVelocity(0.0f),
     m_isDead(false),
     m_isThrusting(false),
-    m_flameSprite(Resources::getInstance().getTexture("Exhaust")),
+    // CORRECTION : m_flameSprite a été retiré d'ici car m_exhaust s'initialise tout seul !
     m_floorY(550.0f),
-    m_state(std::make_unique<WalkState>()), // On commence obligatoirement en marchant
+    m_state(std::make_unique<WalkState>()),
     m_currentMovement(MovementType::Walking)
 {
     m_sprite.setPosition({ 100.0f, 300.0f });
@@ -22,11 +22,7 @@ Player::Player()
 
     m_floorY = 600.0f - static_cast<float>(playerHeight) - 20.0f;
 
-    const sf::Texture& flameTex = Resources::getInstance().getTexture("Exhaust");
-    int flameWidth = flameTex.getSize().x / 6;
-    int flameHeight = flameTex.getSize().y;
-    m_flameSprite.setTextureRect(sf::IntRect({ 0, 0 }, { flameWidth, flameHeight }));
-    m_flameSprite.setOrigin({ static_cast<float>(flameWidth) / 2.0f, 0.0f });
+    // CORRECTION : Tout l'ancien code de découpage manuel de m_flameSprite a été supprimé.
 }
 
 void Player::update(float deltaTime, bool isThrusting) {
@@ -34,7 +30,7 @@ void Player::update(float deltaTime, bool isThrusting) {
 
     m_isThrusting = isThrusting;
 
-    // 1. CALCULS PHYSIQUES (Centralisés dans Player)
+    // 1. CALCULS PHYSIQUES
     m_verticalVelocity += GRAVITY * deltaTime;
 
     if (m_isThrusting) {
@@ -54,7 +50,7 @@ void Player::update(float deltaTime, bool isThrusting) {
         m_verticalVelocity = 0.0f;
     }
 
-    // 2. GESTION DES TRANSITIONS (Comparaison d'enum O(1), pas de dynamic_cast !)
+    // 2. GESTION DES TRANSITIONS
     bool isOnGround = (m_sprite.getPosition().y >= m_floorY);
 
     if (isOnGround && m_currentMovement != MovementType::Walking) {
@@ -71,8 +67,8 @@ void Player::update(float deltaTime, bool isThrusting) {
 }
 
 void Player::draw(sf::RenderWindow& window) const {
-    // On passe les membres graphiques à l'état constant pour affichage ordonné
-    m_state->draw(window, m_sprite, m_flameSprite, m_isThrusting);
+    // CORRECTION : On passe l'objet exhaust à la fonction de dessin de l'état
+    m_state->draw(window, m_sprite, m_exhaust);
 }
 
 void Player::collide(Object& other) {

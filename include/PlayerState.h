@@ -2,17 +2,16 @@
 #include <SFML/Graphics.hpp>
 
 class Player;
+class Exhaust; // Forward Declaration (dit au compilateur que ce type existe)
 
 class PlayerState {
 public:
     virtual ~PlayerState() = default;
 
-    // Modification de l'animation (demande un accès non-const au Player)
     virtual void update(Player& player, float deltaTime) = 0;
 
-    // Rendu graphique (respecte la const-correctness pure de SFML)
+    // Signature unifiée pour le rendu de tous les états
     virtual void draw(sf::RenderWindow& window,
         const sf::Sprite& playerSprite,
-        const sf::Sprite& flameSprite,
-        bool isThrusting) const = 0;
+        const Exhaust& exhaust) const = 0; // <-- Mis à jour ici
 };

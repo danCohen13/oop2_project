@@ -18,7 +18,7 @@ void WalkState::update(Player& player, float deltaTime) {
     }
 }
 
-void WalkState::draw(sf::RenderWindow& window, const sf::Sprite& playerSprite, const sf::Sprite&, bool) const {
-    // Au sol, on ne dessine jamais la flamme du réacteur
+void WalkState::draw(sf::RenderWindow& window, const sf::Sprite& playerSprite, const Exhaust& exhaust) const {
+    exhaust.draw(window);      // N'affichera rien car m_active sera false
     window.draw(playerSprite);
 }

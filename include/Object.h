@@ -17,9 +17,9 @@ public:
     virtual void collide(Object& other) = 0;
 
     // Déclarations uniques pour chaque classe concrète (VÉRIFIEZ BIEN CETTE ZONE)
-    virtual void collide(Player& player) {}
-    virtual void collide(Coin& coin) {}     // UNE SEULE LIGNE POUR COIN !
-    virtual void collide(Laser& laser) {}   // UNE SEULE LIGNE POUR LASER !
+    virtual void collide(Player&) {}
+    virtual void collide(Coin&) {}     // UNE SEULE LIGNE POUR COIN !
+    virtual void collide(Laser&) {}   // UNE SEULE LIGNE POUR LASER !
 
     virtual bool isDisposed() const { return false; }
 

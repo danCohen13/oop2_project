@@ -17,5 +17,5 @@ void Coin::update(float deltaTime) {
 }
 
 void Coin::collide(Object& other) { other.collide(*this); }
-void Coin::collide(Player& player) { m_isDisposed = true; }
+void Coin::collide(Player&) { m_isDisposed = true; }
 bool Coin::isDisposed() const { return m_isDisposed; }
