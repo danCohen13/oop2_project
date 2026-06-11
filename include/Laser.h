@@ -16,7 +16,7 @@ public:
     virtual void collide(Player& player) override;
     virtual bool isDisposed() const override;
 
-    void rotate(float angle); // appelé par les States
+    void rotate(float angle); 
 
 private:
     std::unique_ptr<LaserState> m_currState;

@@ -7,7 +7,6 @@
 Controller::Controller()
     : m_window(sf::VideoMode({ 1200, 600 }), "Jetpack Joyride") {
 
-    // 1. CHARGEMENT DES ASSETS DEPUIS LE DOSSIER RESOURCES
     auto& resources = Resources::getInstance();
     resources.loadTexture("warehouse_background", "resources/warehouse_background.png");
     resources.loadTexture("start_background", "resources/GameMenu.png");
@@ -19,7 +18,6 @@ Controller::Controller()
     resources.loadTexture("Laser", "resources/Laser.png");
 
 
-    // 2. ENCHAINEMENT SUR LE PREMIER ÉCRAN
     m_screens.push(std::make_unique<MenuScreen>(m_screens));
 }
 
@@ -29,7 +27,6 @@ void Controller::run() {
     while (m_window.isOpen() && !m_screens.empty()) {
         float deltaTime = m_clock.restart().asSeconds();
 
-        // SFML 3.0 variant event polling mechanism
         while (const std::optional event = m_window.pollEvent()) {
             if (event->is<sf::Event::Closed>()) {
                 m_window.close();

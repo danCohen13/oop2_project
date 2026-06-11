@@ -24,7 +24,7 @@ public:
     const sf::Font& getFont() const;
 
 private:
-    Resources() = default; // Private constructor
+    Resources() = default; 
     ~Resources() = default;
 
     std::map<std::string, sf::Texture> m_textures;

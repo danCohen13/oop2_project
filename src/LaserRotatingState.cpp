@@ -7,5 +7,5 @@ LaserRotatingState::LaserRotatingState()
 }
 
 void LaserRotatingState::rotate(Laser* laser, float deltaTime) {
-    laser->rotate(m_direction * 90.0f * deltaTime); // 90°/sec
+    laser->rotate(m_direction * 90.0f * deltaTime); 
 }

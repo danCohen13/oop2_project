@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include "Screen.h"
-#include "Board.h"
+#include "GameSession.h"
+#include "HUD.h"
 #include "BackgroundSystem.h"
 #include "InputHandler.h" 
 
@@ -16,7 +17,8 @@ private:
     static constexpr float SCREEN_WIDTH = 1200.0f;
     static constexpr float SCREEN_HEIGHT = 600.0f;
 
-    Board m_board;
+    GameSession m_session;     
+    HUD m_hud;                 
     BackgroundSystem m_backgroundSystem;
-    InputHandler m_inputHandler; 
+    InputHandler m_inputHandler;
 };
