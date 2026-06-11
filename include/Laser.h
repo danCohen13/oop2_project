@@ -16,14 +16,17 @@ public:
     virtual void collide(Player& player) override;
     virtual bool isDisposed() const override;
 
-    void rotate(float angle); // appelé par les States
+    void rotate(float angle); // Appelé par les LaserState
 
 private:
     std::unique_ptr<LaserState> m_currState;
-    sf::RectangleShape m_hitbox; // hitbox réelle plus petite que le sprite
+    sf::RectangleShape m_hitbox;
     bool m_isDisposed = false;
 
-    float m_animationTimer = 0.0f;
-    float m_vibrationTimer = 0.0f;
-    int m_currentFrame = 0;
+    // Ces deux timers restent dans Laser car le laser a sa propre cadence d'animation
+    // (0.09s) différente de la valeur par défaut de SpriteAnimator (0.1s),
+    // et sa vibration est indépendante de l'animation de frame.
+    float m_animationTimer = 0.f;
+    float m_vibrationTimer = 0.f;
+    int   m_currentFrame = 0;
 };

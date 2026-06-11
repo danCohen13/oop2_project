@@ -4,26 +4,24 @@
 #include "LaserStaticState.h"
 #include "LaserRotatingState.h"
 #include <cstdlib>
-#include <cmath> // Requis pour std::sin
+#include <cmath>
 
 Laser::Laser(const sf::Vector2f& position)
-    : StaticGameObject(Resources::getInstance().getTexture("Laser"), position, 4) // On charge la feuille de 4 frames
+    : StaticGameObject(Resources::getInstance().getTexture("Laser"), position, 4)
 {
-    // Configuration de la hitbox (ajustée à 30.f pour l'écartement désiré)
+    // Hitbox étroite et centrée (indépendante du sprite, tourne avec lui)
     m_hitbox.setSize({ 30.f, 350.f });
     m_hitbox.setOrigin({ 15.f, 175.f });
     m_hitbox.setPosition(position);
 
-    // EFFET : On centre l'origine du sprite pour que la vibration se fasse par le milieu
+    // L'origine du sprite est déjà centrée par StaticGameObject,
+    // mais on recalcule ici pour s'assurer que la rotation s'applique au bon point.
     auto textureSize = m_sprite.getTexture().getSize();
     float frameWidth = static_cast<float>(textureSize.x) / 4.f;
     float frameHeight = static_cast<float>(textureSize.y);
     m_sprite.setOrigin({ frameWidth / 2.f, frameHeight / 2.f });
 
-    // Initialisation de la première découpe de texture
-    m_sprite.setTextureRect(sf::IntRect({ 0, 0 }, { static_cast<int>(frameWidth), static_cast<int>(frameHeight) }));
-
-    // Angle de départ aléatoire
+    // Angle de départ aléatoire (multiple de 10°, entre 0 et 170°)
     float angle = static_cast<float>((rand() % 18) * 10);
     rotate(angle);
 
@@ -39,36 +37,31 @@ void Laser::rotate(float angle) {
 }
 
 void Laser::update(float deltaTime) {
+    // 1. Délègue la rotation à l'état courant (Static ou Rotating)
     m_currState->rotate(this, deltaTime);
 
+    // 2. Animation de texture via SpriteAnimator (cadence propre au laser : 0.09s)
+    //    On crée un animator local avec sa propre durée plutôt que la durée par défaut.
+    //    NOTE : le timer de vibration est indépendant de l'animation de frame.
     m_animationTimer += deltaTime;
-    m_vibrationTimer += deltaTime;
-
-    // 1. Ralentissement de l'animation (Changement de frame plus doux)
-    // On passe à 0.09 seconde pour que le mouvement du fluide soit naturel
     if (m_animationTimer >= 0.09f) {
-        m_animationTimer = 0.0f;
+        m_animationTimer = 0.f;
+        // On avance manuellement car le laser a une frameDuration différente (0.09s ≠ 0.1s)
+        // et StaticGameObject::update() utiliserait 0.1s. On garde le contrôle ici.
         m_currentFrame = (m_currentFrame + 1) % 4;
 
-        auto textureSize = m_sprite.getTexture().getSize();
-        int frameWidth = textureSize.x / 4;
-        int frameHeight = textureSize.y;
-
-        m_sprite.setTextureRect(sf::IntRect({ m_currentFrame * frameWidth, 0 }, { frameWidth, frameHeight }));
+        auto texSize = m_sprite.getTexture().getSize();
+        int fw = texSize.x / 4;
+        int fh = texSize.y;
+        m_sprite.setTextureRect(sf::IntRect({ m_currentFrame * fw, 0 }, { fw, fh }));
     }
 
-    // 2. Vibration adoucie et organique de la largeur
-    // On réduit la fréquence (de 65.0f à 12.0f) pour créer une pulsation d'énergie fluide
-    float wave = std::sin(m_vibrationTimer * 12.0f);
-
-    // On restreint les variations de taille entre 92% et 108% de la largeur d'origine
-    float targetScaleX = 1.0f + (wave * 0.08f);
-
-    // On ajoute un micro-bruit très léger (seulement 2% d'instabilité) pour le grésillement
-    float subtleNoise = 0.99f + static_cast<float>(rand() % 3) / 100.0f;
-
-    // Application de l'échelle finale
-    m_sprite.setScale({ targetScaleX * subtleNoise, 1.0f });
+    // 3. Vibration organique sur l'axe X (pulsation d'énergie)
+    m_vibrationTimer += deltaTime;
+    float wave = std::sin(m_vibrationTimer * 12.f);
+    float targetScaleX = 1.f + (wave * 0.08f);
+    float subtleNoise = 0.99f + static_cast<float>(rand() % 3) / 100.f;
+    m_sprite.setScale({ targetScaleX * subtleNoise, 1.f });
 }
 
 void Laser::draw(sf::RenderWindow& window) const {
@@ -87,11 +80,11 @@ void Laser::collide(Player& player) {
         { playerBounds.position.x + playerBounds.size.x, playerBounds.position.y },
         { playerBounds.position.x, playerBounds.position.y + playerBounds.size.y },
         playerBounds.position + playerBounds.size,
-        playerBounds.position + playerBounds.size / 2.0f
+        playerBounds.position + playerBounds.size / 2.f
     };
 
-    sf::Transform inverseTransform = m_hitbox.getInverseTransform();
-    sf::FloatRect localBounds = m_hitbox.getLocalBounds();
+    sf::Transform  inverseTransform = m_hitbox.getInverseTransform();
+    sf::FloatRect  localBounds = m_hitbox.getLocalBounds();
 
     bool realCollision = false;
     for (const auto& point : pointsToTest) {
@@ -102,9 +95,8 @@ void Laser::collide(Player& player) {
         }
     }
 
-    if (realCollision) {
+    if (realCollision)
         player.setDead(true);
-    }
 }
 
 bool Laser::isDisposed() const {
